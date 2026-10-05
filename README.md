@@ -24,6 +24,12 @@
    - Tildar ítems comprados y reingresarlos al botiquín con nueva fecha.
    - Botón para copiar la lista formateada y enviarla por **WhatsApp**.
 
+4. **💾 Respaldo y Persistencia Local (Sin Servidor)**
+   - Persistencia automática en `localStorage` del dispositivo: no se pierde nada al cerrar la app o navegador.
+   - Botón de **Copia de Seguridad**: exportación de todo el botiquín y lista de reposición a un archivo `.json` descargable.
+   - Función de **Restaurar respaldo**: carga de archivos `.json` previamente guardados.
+   - Opción para vaciar o reiniciar el almacenamiento local de forma segura.
+
 ---
 
 ## 📸 Evidencias y Capturas de Pantalla
@@ -46,10 +52,13 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 │   └── README.md                # Guía de nombres y formato de imágenes
 ├── docs/
 │   └── readmes/
-│       └── README-PROMPT-1.md   # Documentación específica del Prompt 1
+│       ├── README-PROMPT-1.md   # Prompt 1: Funciones básicas (Registro, Alerta 30d, Reposición)
+│       ├── README-PROMPT-2.md   # Prompt 2: Letra gótica, emojis 💊 y Modo Oscuro
+│       └── README-PROMPT-3.md   # Prompt 3: Persistencia, Respaldos JSON y Exportación
 ├── src/
 │   ├── components/
-│   │   ├── Header.tsx           # Pestañas táctiles y badges de conteo
+│   │   ├── Header.tsx           # Pestañas táctiles, badges, botón oscuro y botón respaldo
+│   │   ├── BackupModal.tsx      # Modal de exportación / importación JSON y limpieza
 │   │   ├── ProductFormModal.tsx # Registro con atajos de fecha y validación
 │   │   ├── AlertSection.tsx     # Alertas de vencidos y ≤ 30 días
 │   │   ├── RestockList.tsx      # Lista de compras para farmacia y WhatsApp
@@ -57,9 +66,9 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 │   │   └── Toast.tsx            # Notificaciones flotantes no invasivas
 │   ├── utils/
 │   │   ├── dateUtils.ts         # Cálculo exacto de fechas (evitando desfase UTC y DST)
-│   │   └── storage.ts           # Persistencia en localStorage sin servidor
+│   │   └── storage.ts           # Persistencia en localStorage, export e import JSON
 │   ├── types.ts                 # Definición de interfaces TypeScript
-│   ├── App.tsx                  # Coordinador de estados y vistas
+│   ├── App.tsx                  # Coordinador de estados, temas y modales
 │   └── index.css                # Estilos globales con Tailwind CSS
 ├── README.md                    # Este archivo
 └── package.json
@@ -93,3 +102,4 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 
 - [Prompt 1: Versión Funcional (Registro + Alerta 30d + Lista de Reposición)](./docs/readmes/README-PROMPT-1.md)
 - [Prompt 2: Identidad Gótica, Emoji de Pastillas 💊 y Modo Oscuro](./docs/readmes/README-PROMPT-2.md)
+- [Prompt 3: Persistencia en LocalStorage, Exportación JSON y Respaldos](./docs/readmes/README-PROMPT-3.md)
