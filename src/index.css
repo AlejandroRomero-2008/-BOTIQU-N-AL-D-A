@@ -6,3 +6,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+.font-gothic {
+  font-family: 'MedievalSharp', 'UnifrakturMaguntia', 'Cinzel Decorative', cursive, serif;
+  letter-spacing: 0.04em;
+}
