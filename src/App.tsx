@@ -17,6 +17,7 @@ import { ProductList } from './components/ProductList';
 import { AlertSection } from './components/AlertSection';
 import { RestockList } from './components/RestockList';
 import { ProductFormModal } from './components/ProductFormModal';
+import { BackupModal } from './components/BackupModal';
 import { Toast, ToastMessage } from './components/Toast';
 import { Product, RestockItem } from './types';
 import { getDaysRemaining } from './utils/dateUtils';
@@ -25,6 +26,7 @@ import {
   saveProducts,
   getSavedRestockItems,
   saveRestockItems,
+  clearAllStoredData,
 } from './utils/storage';
 import { ShieldCheck, Info } from 'lucide-react';
 
@@ -68,6 +70,9 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  // Estado del modal de respaldo
+  const [isBackupOpen, setIsBackupOpen] = useState(false);
+
   // Notificación tipo Toast
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -77,6 +82,20 @@ export default function App() {
       type,
       message,
     });
+  };
+
+  const handleRestoreBackup = (newProducts: Product[], newRestockItems: RestockItem[]) => {
+    setProducts(newProducts);
+    setRestockItems(newRestockItems);
+    saveProducts(newProducts);
+    saveRestockItems(newRestockItems);
+  };
+
+  const handleClearAllData = () => {
+    clearAllStoredData();
+    setProducts([]);
+    setRestockItems([]);
+    showToast('Se vaciaron todos los datos del botiquín 🗑️', 'info');
   };
 
   // Carga inicial desde localStorage
@@ -282,6 +301,7 @@ export default function App() {
           setEditingProduct(null);
           setIsModalOpen(true);
         }}
+        onOpenBackup={() => setIsBackupOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isDarkMode={isDarkMode}
@@ -354,6 +374,17 @@ export default function App() {
         }}
         onSave={handleSaveProduct}
         initialProduct={editingProduct}
+      />
+
+      {/* Modal de Copias de Seguridad y Datos */}
+      <BackupModal
+        isOpen={isBackupOpen}
+        onClose={() => setIsBackupOpen(false)}
+        products={products}
+        restockItems={restockItems}
+        onRestore={handleRestoreBackup}
+        onClearAll={handleClearAllData}
+        onShowToast={showToast}
       />
 
       {/* Notificaciones flotantes */}
