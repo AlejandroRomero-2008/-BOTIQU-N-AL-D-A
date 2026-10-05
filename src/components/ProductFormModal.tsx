@@ -46,6 +46,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const [category, setCategory] = useState(COMMON_CATEGORIES[0]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sincronizar campos cuando se abre en modo edición o creación
   useEffect(() => {
@@ -65,22 +66,18 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       setNotes('');
     }
     setError(null);
+    setIsSubmitting(false);
   }, [initialProduct, isOpen]);
 
   if (!isOpen) return null;
 
   /**
-   * ⚠️ ATENCIÓN: Helper para calcular fechas rápidas (+6 meses, +1 año, etc.)
-   * ERROR FRECUENTE: Usar d.setMonth(d.getMonth() + 6) sin formatear en horario local
-   * puede generar fechas en días inexistentes (ej. 31 de abril pasa a mayo) o alterar
-   * la fecha por desfase UTC.
+   * Helper para calcular fechas rápidas (+6 meses, +1 año, etc.)
    */
   const handleQuickDateAdd = (monthsToAdd: number) => {
     const target = new Date();
-    // Normalizamos al día 1 antes de cambiar el mes para evitar desbordamiento en meses de 28/30 días
     const currentDay = target.getDate();
     target.setMonth(target.getMonth() + monthsToAdd);
-    // Si el mes destino no tiene tantos días, se ajusta al último día del mes
     if (target.getDate() < currentDay) {
       target.setDate(0);
     }
@@ -92,38 +89,59 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return; // Evita doble clic o doble envío
     setError(null);
 
-    // Validación de nombre
-    if (!name.trim()) {
-      setError('Por favor ingresá el nombre del medicamento o producto.');
+    // 1. Validación de espacios en blanco y longitud máxima
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setError('Por favor ingresá el nombre del medicamento (no puede estar vacío ni contener solo espacios).');
+      return;
+    }
+    if (trimmedName.length > 100) {
+      setError('El nombre del medicamento no puede superar los 100 caracteres.');
       return;
     }
 
-    // ⚠️ ATENCIÓN: Parseo de cantidad numérica
-    // ERROR FRECUENTE: Tratar el input como string o aceptar 0/negativos sin validar
+    // 2. Parseo de cantidad numérica (evita negativos, NaN, ceros y números excesivos)
     const parsedQty = typeof quantity === 'number' ? quantity : parseFloat(quantity);
     if (isNaN(parsedQty) || parsedQty <= 0) {
-      setError('La cantidad debe ser un número mayor a cero.');
+      setError('La cantidad debe ser un número positivo mayor a cero.');
+      return;
+    }
+    if (parsedQty > 999999) {
+      setError('La cantidad no puede exceder 999,999 unidades.');
       return;
     }
 
-    // ⚠️ ATENCIÓN: Validación estricta de fecha YYYY-MM-DD
-    // ERROR FRECUENTE: Guardar un string vacío o mal formado provoca que
-    // los cálculos de días restantes devuelvan NaN y rompan la interfaz.
+    // 3. Validación estricta de fecha YYYY-MM-DD y rango razonable de años (1990 - 2099)
     if (!expirationDate || !/^\d{4}-\d{2}-\d{2}$/.test(expirationDate)) {
       setError('Por favor seleccioná una fecha de vencimiento válida (Año, Mes y Día).');
       return;
     }
+    const year = parseInt(expirationDate.split('-')[0], 10);
+    if (year < 1990 || year > 2099) {
+      setError('El año de vencimiento debe estar entre 1990 y 2099.');
+      return;
+    }
+
+    // 4. Notas: límite de caracteres
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length > 300) {
+      setError('Las observaciones no pueden superar los 300 caracteres.');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     onSave({
       id: initialProduct?.id,
-      name: name.trim(),
+      name: trimmedName,
       quantity: parsedQty,
       unit: unit.trim() || 'unidades',
       expirationDate,
       category,
-      notes: notes.trim() || undefined,
+      notes: trimmedNotes || undefined,
     });
 
     onClose();
@@ -181,6 +199,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               type="text"
               required
               autoFocus
+              maxLength={100}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Ibuprofeno 400 mg, Gasas, Paracetamol..."
@@ -197,8 +216,14 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               <input
                 type="number"
                 min="0.1"
+                max="999999"
                 step="any"
                 required
+                onKeyDown={(e) => {
+                  if (['e', 'E', '+', '-'].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="10"
@@ -238,6 +263,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             <input
               type="date"
               required
+              min="1990-01-01"
+              max="2099-12-31"
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:outline-hidden focus:ring-2 focus:ring-teal-500 text-sm font-medium text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800"
@@ -308,6 +335,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             </label>
             <input
               type="text"
+              maxLength={300}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej: Dosis de los niños, abierto en cocina, etc."
@@ -320,16 +348,28 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             <button
               type="button"
               onClick={onClose}
+              disabled={isSubmitting}
               className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-2 py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-700 text-white font-semibold text-sm shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              disabled={isSubmitting}
+              className={`flex-2 py-2.5 px-4 rounded-xl text-white font-semibold text-sm shadow-xs transition-colors flex items-center justify-center gap-1.5 ${
+                isSubmitting
+                  ? 'bg-slate-400 dark:bg-slate-600 cursor-not-allowed'
+                  : 'bg-teal-700 hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-700 cursor-pointer'
+              }`}
             >
               <Check className="w-4 h-4 stroke-[3]" />
-              <span>{initialProduct ? 'Guardar Cambios' : 'Registrar en Botiquín 💊'}</span>
+              <span>
+                {isSubmitting
+                  ? 'Guardando...'
+                  : initialProduct
+                  ? 'Guardar Cambios'
+                  : 'Registrar en Botiquín 💊'}
+              </span>
             </button>
           </div>
         </form>
