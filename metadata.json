@@ -1,0 +1,7 @@
+{
+  "name": "Botiquín al Día",
+  "description": "Control de vencimiento de medicamentos y lista de reposición para el hogar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
