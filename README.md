@@ -92,3 +92,4 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 ## 📜 Historial de Prompts y Versiones
 
 - [Prompt 1: Versión Funcional (Registro + Alerta 30d + Lista de Reposición)](./docs/readmes/README-PROMPT-1.md)
+- [Prompt 2: Identidad Gótica, Emoji de Pastillas 💊 y Modo Oscuro](./docs/readmes/README-PROMPT-2.md)
