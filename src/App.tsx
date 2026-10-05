@@ -33,6 +33,34 @@ export default function App() {
   const [restockItems, setRestockItems] = useState<RestockItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Modo Oscuro persistente
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('botiquin_dark_mode');
+      if (saved !== null) {
+        return saved === 'true';
+      }
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
+
+  // Efecto para sincronizar clase 'dark' en el elemento raíz HTML
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('botiquin_dark_mode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('botiquin_dark_mode', 'false');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
   // Navegación de pestañas: 'inventory' | 'alerts' | 'restock'
   const [activeTab, setActiveTab] = useState<'inventory' | 'alerts' | 'restock'>('inventory');
 
@@ -244,7 +272,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans pb-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans pb-12 transition-colors duration-200">
       {/* Cabecera Principal con Pestañas y Contadores */}
       <Header
         expiredCount={expiredCount}
@@ -256,6 +284,8 @@ export default function App() {
         }}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
       />
 
       {/* Contenido Principal */}
@@ -301,13 +331,13 @@ export default function App() {
         )}
 
         {/* Banner de buenas prácticas para el responsable del hogar */}
-        <div className="mt-8 bg-teal-50/70 border border-teal-200/80 rounded-2xl p-4 text-xs text-teal-900 flex items-start gap-3">
-          <Info className="w-5 h-5 text-teal-700 shrink-0 mt-0.5" />
+        <div className="mt-8 bg-teal-50/70 dark:bg-teal-950/30 border border-teal-200/80 dark:border-teal-800/60 rounded-2xl p-4 text-xs text-teal-900 dark:text-teal-200 flex items-start gap-3">
+          <Info className="w-5 h-5 text-teal-700 dark:text-teal-400 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-teal-950">
-              Consejo de seguridad del botiquín familiar
+            <p className="font-bold text-teal-950 dark:text-teal-100 flex items-center gap-1.5">
+              <span>💊</span> Consejo de seguridad del botiquín familiar
             </p>
-            <p className="text-teal-800/90 mt-0.5 leading-relaxed">
+            <p className="text-teal-800/90 dark:text-teal-300/90 mt-0.5 leading-relaxed">
               Los medicamentos vencidos pierden eficacia y pueden volverse tóxicos.
               Nunca los deseches por el inodoro o desagüe. Acércalos a un punto limpio o farmacia para su disposición segura.
             </p>
