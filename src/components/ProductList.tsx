@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Plus, Pill, ShoppingCart, Edit3, Trash2, Calendar, AlertCircle } from 'lucide-react';
+import { Search, Filter, Plus, Pill, ShoppingCart, Edit3, Trash2, Calendar, AlertCircle, Sparkles } from 'lucide-react';
 import { Product, ProductStatus } from '../types';
 import { getDaysRemaining, formatDisplayDate, getExpirationBadge } from '../utils/dateUtils';
 
@@ -9,6 +9,7 @@ interface ProductListProps {
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (productId: string) => void;
   onAddToRestock: (product: Product, reason: 'vencido' | 'por_vencer' | 'agotado') => void;
+  onConsultAi?: (medicationName: string) => void;
 }
 
 export const ProductList: React.FC<ProductListProps> = ({
@@ -17,6 +18,7 @@ export const ProductList: React.FC<ProductListProps> = ({
   onEditProduct,
   onDeleteProduct,
   onAddToRestock,
+  onConsultAi,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | ProductStatus>('all');
@@ -242,6 +244,18 @@ export const ProductList: React.FC<ProductListProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800 shrink-0">
+                    {onConsultAi && (
+                      <button
+                        type="button"
+                        onClick={() => onConsultAi(product.name)}
+                        className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
+                        title="Consultar ficha farmacológica estructurada con IA"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span className="hidden sm:inline">Info IA</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() =>

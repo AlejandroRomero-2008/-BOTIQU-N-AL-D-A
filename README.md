@@ -30,6 +30,12 @@
    - Función de **Restaurar respaldo**: carga de archivos `.json` previamente guardados.
    - Opción para vaciar o reiniciar el almacenamiento local de forma segura.
 
+5. **🧠 Consultor Farmacológico con IA Estructurada (Gemini API)**
+   - Consultas sobre medicamentos y compuestos con el modelo `gemini-3.8-flash`.
+   - Salida fija y estructurada en formato JSON (`responseSchema`), sin texto libre.
+   - Presentación visual en datos discretos: badges de receta/urgencia, tarjetas métricas y lista de advertencias.
+   - Soporte para **Modo Mock** para probar sin gastar cuota de API y manejo resiliente de timeouts.
+
 ---
 
 ## 📸 Evidencias y Capturas de Pantalla
@@ -104,4 +110,5 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 - [Prompt 2: Identidad Gótica, Emoji de Pastillas 💊 y Modo Oscuro](./docs/readmes/README-PROMPT-2.md)
 - [Prompt 3: Persistencia en LocalStorage, Exportación JSON y Respaldos](./docs/readmes/README-PROMPT-3.md)
 - [Prompt 4: Casos de Prueba, QA y Blindaje de UI](./docs/readmes/README-PROMPT-4.md)
+- [Prompt 5 (M5): Inteligencia con Salida Estructurada (Gemini API)](./docs/readmes/README-PROMPT-5.md)
 

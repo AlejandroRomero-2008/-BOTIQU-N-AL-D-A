@@ -18,6 +18,7 @@ import { AlertSection } from './components/AlertSection';
 import { RestockList } from './components/RestockList';
 import { ProductFormModal } from './components/ProductFormModal';
 import { BackupModal } from './components/BackupModal';
+import { AiConsultModal } from './components/AiConsultModal';
 import { Toast, ToastMessage } from './components/Toast';
 import { Product, RestockItem } from './types';
 import { getDaysRemaining } from './utils/dateUtils';
@@ -72,6 +73,10 @@ export default function App() {
 
   // Estado del modal de respaldo
   const [isBackupOpen, setIsBackupOpen] = useState(false);
+
+  // Estado del consultor farmacológico con IA estructurada
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [selectedAiMedication, setSelectedAiMedication] = useState('Ibuprofeno 400 mg');
 
   // Notificación tipo Toast
   const [toast, setToast] = useState<ToastMessage | null>(null);
@@ -302,6 +307,10 @@ export default function App() {
           setIsModalOpen(true);
         }}
         onOpenBackup={() => setIsBackupOpen(true)}
+        onOpenAiConsult={() => {
+          setSelectedAiMedication('Ibuprofeno 400 mg');
+          setIsAiModalOpen(true);
+        }}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isDarkMode={isDarkMode}
@@ -323,6 +332,10 @@ export default function App() {
             }}
             onDeleteProduct={handleDeleteProduct}
             onAddToRestock={handleAddToRestock}
+            onConsultAi={(medName) => {
+              setSelectedAiMedication(medName);
+              setIsAiModalOpen(true);
+            }}
           />
         )}
 
@@ -385,6 +398,13 @@ export default function App() {
         onRestore={handleRestoreBackup}
         onClearAll={handleClearAllData}
         onShowToast={showToast}
+      />
+
+      {/* Modal de Consultor Farmacológico con IA Estructurada */}
+      <AiConsultModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        defaultMedicationName={selectedAiMedication}
       />
 
       {/* Notificaciones flotantes */}

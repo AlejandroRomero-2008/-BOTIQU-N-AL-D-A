@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, ShieldAlert, AlertTriangle, ShoppingCart, Moon, Sun, Database } from 'lucide-react';
+import { Plus, ShieldAlert, AlertTriangle, ShoppingCart, Moon, Sun, Database, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   expiredCount: number;
@@ -7,6 +7,7 @@ interface HeaderProps {
   restockCount: number;
   onOpenNewProduct: () => void;
   onOpenBackup: () => void;
+  onOpenAiConsult: () => void;
   activeTab: 'inventory' | 'alerts' | 'restock';
   setActiveTab: (tab: 'inventory' | 'alerts' | 'restock') => void;
   isDarkMode: boolean;
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   restockCount,
   onOpenNewProduct,
   onOpenBackup,
+  onOpenAiConsult,
   activeTab,
   setActiveTab,
   isDarkMode,
@@ -49,6 +51,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Botón Consultor IA */}
+            <button
+              onClick={onOpenAiConsult}
+              className="flex items-center gap-1 px-2.5 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors text-xs font-semibold cursor-pointer"
+              title="Consultar información estructurada con IA"
+              aria-label="Consultar IA"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">IA Farmacia</span>
+            </button>
+
             {/* Botón Respaldo / Datos */}
             <button
               onClick={onOpenBackup}
