@@ -103,3 +103,5 @@ Podés colocar las capturas de la app dentro de la carpeta [`/evidencias`](./evi
 - [Prompt 1: Versión Funcional (Registro + Alerta 30d + Lista de Reposición)](./docs/readmes/README-PROMPT-1.md)
 - [Prompt 2: Identidad Gótica, Emoji de Pastillas 💊 y Modo Oscuro](./docs/readmes/README-PROMPT-2.md)
 - [Prompt 3: Persistencia en LocalStorage, Exportación JSON y Respaldos](./docs/readmes/README-PROMPT-3.md)
+- [Prompt 4: Casos de Prueba, QA y Blindaje de UI](./docs/readmes/README-PROMPT-4.md)
+
