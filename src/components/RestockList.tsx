@@ -26,11 +26,16 @@ export const RestockList: React.FC<RestockListProps> = ({
 
   const handleManualAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemName.trim()) {
-      setError('Por favor escribí el nombre del producto.');
+    const trimmed = newItemName.trim();
+    if (!trimmed) {
+      setError('Por favor escribí el nombre del producto (no puede estar vacío).');
       return;
     }
-    onAddItem(newItemName.trim(), newItemQty.trim() || '1 unidad', 'manual');
+    if (trimmed.length > 100) {
+      setError('El nombre no puede superar los 100 caracteres.');
+      return;
+    }
+    onAddItem(trimmed, newItemQty.trim().slice(0, 30) || '1 unidad', 'manual');
     setNewItemName('');
     setNewItemQty('1 caja');
     setError(null);
@@ -104,6 +109,7 @@ export const RestockList: React.FC<RestockListProps> = ({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <input
               type="text"
+              maxLength={100}
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder="¿Qué necesitás reponer? Ej: Alcohol, Gasas, Paracetamol 💊..."
@@ -111,6 +117,7 @@ export const RestockList: React.FC<RestockListProps> = ({
             />
             <input
               type="text"
+              maxLength={30}
               value={newItemQty}
               onChange={(e) => setNewItemQty(e.target.value)}
               placeholder="Cant: 1 caja"
