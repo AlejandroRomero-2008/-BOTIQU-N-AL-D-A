@@ -145,3 +145,88 @@ export function saveRestockItems(items: RestockItem[]): void {
     console.error('Error al guardar lista de reposición en localStorage:', error);
   }
 }
+
+export interface BackupData {
+  appName: string;
+  version: string;
+  exportedAt: string;
+  products: Product[];
+  restockItems: RestockItem[];
+}
+
+/**
+ * 3. EXPORTAR DATOS A UN ARCHIVO JSON DE RESPALDO
+ */
+export function exportBackupData(products: Product[], restockItems: RestockItem[]): BackupData {
+  return {
+    appName: 'Botiquín al Día 💊',
+    version: '1.2.0',
+    exportedAt: new Date().toISOString(),
+    products,
+    restockItems,
+  };
+}
+
+/**
+ * Descarga el archivo JSON en la computadora o celular del usuario.
+ */
+export function downloadBackupFile(products: Product[], restockItems: RestockItem[]): void {
+  const data = exportBackupData(products, restockItems);
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const today = new Date().toISOString().split('T')[0];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `botiquin-respaldo-${today}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * IMPORTAR RESPALDO DESDE ARCHIVO JSON
+ * Valida la estructura para evitar inyectar datos corruptos.
+ */
+export function parseAndValidateBackup(jsonString: string): {
+  success: boolean;
+  message: string;
+  data?: { products: Product[]; restockItems: RestockItem[] };
+} {
+  try {
+    const parsed = JSON.parse(jsonString);
+    if (!parsed || typeof parsed !== 'object') {
+      return { success: false, message: 'El archivo no contiene un JSON válido.' };
+    }
+
+    if (!Array.isArray(parsed.products) || !Array.isArray(parsed.restockItems)) {
+      return { success: false, message: 'El archivo no tiene el formato de respaldo de Botiquín al Día.' };
+    }
+
+    return {
+      success: true,
+      message: `Se importaron ${parsed.products.length} medicamentos y ${parsed.restockItems.length} ítems de reposición.`,
+      data: {
+        products: parsed.products,
+        restockItems: parsed.restockItems,
+      },
+    };
+  } catch (error) {
+    return { success: false, message: 'Error de sintaxis al leer el archivo JSON.' };
+  }
+}
+
+/**
+ * BORRAR TODOS LOS DATOS (Limpieza de almacenamiento)
+ */
+export function clearAllStoredData(): void {
+  try {
+    localStorage.removeItem(PRODUCTS_STORAGE_KEY);
+    localStorage.removeItem(RESTOCK_STORAGE_KEY);
+  } catch (error) {
+    console.error('Error al limpiar localStorage:', error);
+  }
+}
+
